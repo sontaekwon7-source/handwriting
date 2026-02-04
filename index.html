@@ -6,126 +6,94 @@
     <title>Math Pencil Artist ✏️</title>
     <style>
         body {
-            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f5f6fa;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
         }
-        .container {
+        .main-wrapper {
+            display: flex;
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 95%;
+            gap: 30px;
         }
-        h1 { color: #1a1a1a; font-size: 22px; margin-bottom: 8px; }
-        p { color: #666; font-size: 14px; margin-bottom: 25px; }
+        /* 왼쪽 입력 섹션 */
+        .input-section { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        /* 오른쪽 결과 섹션 */
+        .result-section { 
+            flex: 1; 
+            min-height: 400px; 
+            border: 2px dashed #ddd; 
+            border-radius: 15px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            background: #fafafa;
+            position: relative;
+        }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #333; }
+        textarea {
+            width: 100%; height: 100px; padding: 15px; border-radius: 10px;
+            border: 2px solid #eee; font-size: 16px; resize: none; box-sizing: border-box;
+        }
+        button#drawBtn {
+            width: 100%; padding: 15px; background: #007bff; color: white;
+            border: none; border-radius: 10px; font-size: 18px; font-weight: bold;
+            cursor: pointer; margin-top: 20px;
+        }
+        button#drawBtn:disabled { background: #ccc; }
         
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 16px;
-            box-sizing: border-box;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-        }
-        input[type="text"]:focus { border-color: #007bff; outline: none; }
+        #statusMsg { margin-top: 15px; color: #007bff; font-weight: bold; display: none; }
         
-        button {
-            width: 100%;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
+        img { max-width: 100%; border-radius: 10px; display: block; }
+        .download-btn {
+            margin-top: 15px; padding: 10px 20px; background: #28a745;
+            color: white; text-decoration: none; border-radius: 8px; font-weight: bold;
         }
-        button:hover { background-color: #0056b3; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        #result { margin-top: 25px; min-height: 50px; }
-        img { width: 100%; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .loading { color: #007bff; font-weight: bold; }
-        .error { color: #ff4d4d; font-size: 13px; text-align: left; background: #fff5f5; padding: 10px; border-radius: 8px; border: 1px solid #ffcccc; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>✏️ Math Pencil Artist</h1>
-    <p>수식을 넣으면 학생이 쓴 연필 글씨로 변환합니다.</p>
-    
-    <input type="text" id="formula" placeholder="수식을 입력하세요 (예: E=mc^2)" value="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}">
-    <button id="drawBtn" onclick="generateImage()">그림 그리기</button>
+<div class="main-wrapper">
+    <div class="input-section">
+        <h1>✏️ Math Pencil Artist</h1>
+        <p>수식을 입력하고 버튼을 누르세요.</p>
+        <textarea id="formula" placeholder="여기에 수식을 입력하세요 (예: E=mc^2)">x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}</textarea>
+        <button id="drawBtn" onclick="generateImage()">그림 그리기</button>
+        <div id="statusMsg">학생이 연필로 열심히 적는 중입니다. 잠시만 기다려주세요...</div>
+    </div>
 
-    <div id="result"></div>
+    <div class="result-section" id="resultDisplay">
+        <p id="placeholderText" style="color:#aaa;">결과 이미지가 여기에 나타납니다.</p>
+    </div>
 </div>
 
 <script>
-    // ★★★ 중요: 아래 큰따옴표 안에 본인의 API 키를 꼭 넣으세요 ★★★
+    // ★ 여기에 본인의 OpenAI API 키를 넣으세요
     const MY_API_KEY = "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"; 
 
     async function generateImage() {
         const formula = document.getElementById('formula').value;
-        const resultDiv = document.getElementById('result');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const statusMsg = document.getElementById('statusMsg');
         const drawBtn = document.getElementById('drawBtn');
 
         if (!MY_API_KEY || MY_API_KEY.includes("여기에")) {
-            alert("코드 72번째 줄에 OpenAI API 키를 먼저 입력해주세요!");
+            alert("코드 내부에 API 키를 입력해주세요!");
             return;
         }
 
-        // 상태 초기화
-        resultDiv.innerHTML = "<p class='loading'>연필로 열심히 받아적는 중...</p>";
+        // 초기화 및 로딩 시작
+        statusMsg.style.display = "block";
         drawBtn.disabled = true;
+        resultDisplay.innerHTML = '<div class="spinner">🎨 그리는 중...</div>';
 
-        const prompt = `A realistic top-down photo of the math equation '${formula}' handwritten in pencil on lined paper. Student's neat but natural handwriting, graphite texture, soft natural lighting.`;
-
-        try {
-            const response = await fetch('https://api.openai.com/v1/images/generations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${MY_API_KEY.trim()}`
-                },
-                body: JSON.stringify({
-                    model: "dall-e-3",
-                    prompt: prompt,
-                    n: 1,
-                    size: "1024x1024"
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                resultDiv.innerHTML = `<img src="${data.data[0].url}" alt="Handwritten Formula">`;
-            } else {
-                // 상세 에러 메시지 표시
-                resultDiv.innerHTML = `
-                    <div class="error">
-                        <strong>오류 발생!</strong><br>
-                        사유: ${data.error.message}<br>
-                        <small>(키가 올바른지, 계정에 잔액이 있는지 확인하세요.)</small>
-                    </div>`;
-            }
-        } catch (error) {
-            resultDiv.innerHTML = "<p class='error'>네트워크 연결에 문제가 있습니다.</p>";
-        } finally {
-            drawBtn.disabled = false;
-        }
-    }
-</script>
-
-</body>
-</html>
+        const prompt = `A realistic top-down photo of the math equation '${formula}' handwritten
