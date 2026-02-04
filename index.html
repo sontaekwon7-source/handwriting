@@ -5,100 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Pencil Artist ✏️</title>
     <style>
-        body { font-family: 'Apple SD Gothic Neo', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .main-wrapper { display: flex; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 1100px; width: 95%; gap: 30px; }
-        
-        /* 왼쪽 입력 섹션 */
-        .left-panel { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        /* 오른쪽 결과 섹션 */
-        .right-panel { 
-            flex: 1.2; background: #fafafa; border: 2px dashed #ddd; border-radius: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 500px; position: relative; overflow: hidden;
-        }
-        
-        h1 { font-size: 24px; margin-bottom: 10px; color: #333; }
-        p.desc { color: #666; font-size: 14px; margin-bottom: 25px; }
-        
-        input[type="text"] {
-            width: 100%; padding: 18px; border-radius: 12px; border: 2px solid #eee;
-            font-size: 18px; box-sizing: border-box; margin-bottom: 20px; outline: none;
-        }
-        input[type="text"]:focus { border-color: #0084ff; }
-        
-        button#drawBtn {
-            width: 100%; padding: 18px; background: #0084ff; color: white;
-            border: none; border-radius: 12px; font-size: 18px; font-weight: bold;
-            cursor: pointer; transition: 0.3s;
-        }
-        button#drawBtn:hover { background: #0056b3; }
-        button#drawBtn:disabled { background: #ccc; cursor: not-allowed; }
-
-        /* 상태 메시지 */
-        #statusMsg { margin-top: 20px; color: #0084ff; font-weight: bold; display: none; text-align: center; }
-        
-        /* 결과 이미지 및 버튼 */
-        img { max-width: 95%; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .download-link {
-            padding: 12px 25px; background: #28a745; color: white;
-            text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s;
-        }
-        .download-link:hover { background: #218838; }
-        .error-msg { color: #d63031; padding: 20px; text-align: center; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; background-color: #f5f6fa; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { display: flex; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 45px rgba(0,0,0,0.1); max-width: 1000px; width: 95%; gap: 20px; }
+        .left { flex: 1; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #eee; padding-right: 20px; }
+        .right { flex: 1.2; min-height: 500px; background: #fafafa; border: 2px dashed #ddd; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        h1 { font-size: 22px; color: #333; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid #eee; font-size: 16px; box-sizing: border-box; margin-bottom: 15px; }
+        button { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        #loading { display: none; margin-top: 15px; color: #007bff; font-weight: bold; text-align: center; }
+        img { max-width: 90%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .download-btn { margin-top: 20px; padding: 12px 25px; background: #28a745; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+        .error-msg { color: #d63031; padding: 20px; text-align: center; background: #fff5f5; border-radius: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="left-panel">
+<div class="container">
+    <div class="left">
         <h1>✏️ Math Pencil Artist</h1>
-        <p class="desc">수식을 입력하면 학생이 쓴 연필 글씨로 그려줍니다.</p>
-        
-        <input type="text" id="formula" value="1/2+3/4=4/6" placeholder="수식을 입력하세요">
-        
-        <button id="drawBtn" onclick="generateImage()">그림 그리기</button>
-        
-        <div id="statusMsg">⏳ 학생이 연필로 열심히 적는 중입니다...<br>잠시만 기다려주세요! (약 10초)</div>
+        <p style="color:#666; font-size:14px;">수식을 입력하면 학생이 쓴 연필 글씨로 변환합니다.</p>
+        <input type="text" id="formulaInput" value="1/2 + 3/4 = 4/6">
+        <button id="drawBtn">그림 그리기</button>
+        <div id="loading">⏳ 학생이 연필로 받아적는 중입니다...<br>잠시만 기다려주세요!</div>
     </div>
 
-    <div class="right-panel" id="resultArea">
-        <p id="placeholder" style="color:#aaa;">결과 이미지가 여기에 나타납니다.</p>
+    <div class="right" id="resultArea">
+        <p id="guide" style="color:#aaa;">결과 이미지가 여기에 나타납니다.</p>
     </div>
 </div>
 
 <script>
-    // ★★★ 여기에 본인의 OpenAI API 키를 따옴표 안에 넣으세요 ★★★
-    const MY_API_KEY = "여기에_키를_넣으세요"; 
+    // ★★★ 여기에 본인의 OpenAI API 키를 입력하세요 ★★★
+    const API_KEY = "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";
 
-    async function generateImage() {
-        const formula = document.getElementById('formula').value;
+    // 버튼 클릭 이벤트 리스너 (onclick 대신 이 방식을 써야 에러가 안 납니다)
+    document.getElementById('drawBtn').addEventListener('click', async function() {
+        const formula = document.getElementById('formulaInput').value;
         const resultArea = document.getElementById('resultArea');
-        const statusMsg = document.getElementById('statusMsg');
-        const drawBtn = document.getElementById('drawBtn');
+        const loading = document.getElementById('loading');
+        const btn = this;
 
-        // 1. 키 체크
-        if (!MY_API_KEY || MY_API_KEY.includes("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")) {
-            alert("코드 80번째 줄에 API 키를 입력해야 작동합니다!");
+        if (!API_KEY || API_KEY.startsWith("YOUR")) {
+            alert("코드 내부에 API 키를 정확히 입력해주세요!");
             return;
         }
 
-        // 2. UI 초기화 (버튼 비활성화 및 로딩 표시)
-        drawBtn.disabled = true;
-        statusMsg.style.display = "block";
-        resultArea.innerHTML = "<p style='color:#0084ff; font-weight:bold;'>🎨 AI가 그림을 생성하는 중...</p>";
-
-        const prompt = `A realistic top-down photo of the math equation '${formula}' handwritten in graphite pencil on lined notebook paper. Natural student's handwriting, visible pencil lead texture, subtle smudges, soft side lighting.`;
+        // 초기 상태 설정
+        btn.disabled = true;
+        loading.style.display = "block";
+        resultArea.innerHTML = "<p>🎨 AI가 그림을 그리는 중입니다...</p>";
 
         try {
             const response = await fetch('https://api.openai.com/v1/images/generations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${MY_API_KEY.trim()}`
+                    'Authorization': `Bearer ${API_KEY.trim()}`
                 },
                 body: JSON.stringify({
                     model: "dall-e-3",
-                    prompt: prompt,
+                    prompt: `A realistic top-down photo of the math equation '${formula}' handwritten in graphite pencil on lined paper. Student's natural handwriting, visible pencil texture, soft lighting.`,
                     n: 1,
                     size: "1024x1024"
                 })
@@ -108,23 +76,22 @@
 
             if (response.ok) {
                 const imgUrl = data.data[0].url;
-                // 오른쪽 패널에 이미지와 다운로드 버튼 배치
                 resultArea.innerHTML = `
-                    <img src="${imgUrl}" alt="Generated Image">
-                    <a href="${imgUrl}" target="_blank" download="pencil_math.png" class="download-link">📥 이미지 다운로드 / 저장</a>
+                    <img src="${imgUrl}" alt="Result">
+                    <a href="${imgUrl}" target="_blank" class="download-btn">📥 이미지 저장하기</a>
                 `;
             } else {
-                // API 에러 상세 출력
-                resultArea.innerHTML = `<div class="error-msg"><strong>에러 발생!</strong><br>${data.error.message}</div>`;
+                // OpenAI 서버에서 보낸 에러 메시지를 우측에 표시
+                resultArea.innerHTML = `<div class="error-msg"><b>생성 실패</b><br>${data.error.message}</div>`;
             }
-        } catch (error) {
-            resultArea.innerHTML = `<div class="error-msg">네트워크 오류가 발생했습니다.<br>인터넷 연결을 확인해주세요.</div>`;
+        } catch (e) {
+            // 인터넷 연결이나 키 형식이 아예 잘못된 경우
+            resultArea.innerHTML = `<div class="error-msg"><b>네트워크 오류</b><br>API 키가 정확한지, 혹은 결제 수단이 등록되어 있는지 확인하세요.</div>`;
         } finally {
-            // 3. 상태 복구
-            drawBtn.disabled = false;
-            statusMsg.style.display = "none";
+            btn.disabled = false;
+            loading.style.display = "none";
         }
-    }
+    });
 </script>
 
 </body>
