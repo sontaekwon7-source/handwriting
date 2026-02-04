@@ -1,27 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Pencil Artist ✏️</title>
+    <style>
+        /* 깔끔한 미니멀 디자인 */
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        h1 { color: #2d3436; font-size: 24px; margin-bottom: 10px; }
+        p { color: #636e72; font-size: 14px; margin-bottom: 30px; }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus { border-color: #0984e3; }
+        
+        button {
+            width: 100%;
+            background-color: #0984e3;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+        button:hover { background-color: #074b83; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+
+        #result { margin-top: 30px; }
+        img { width: 100%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .loading { color: #0984e3; font-weight: bold; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✏️ Math Pencil Artist</h1>
+    <p>수식을 입력하면 학생의 연필 글씨로 변환합니다.</p>
+    
+    <div class="input-group">
+        <input type="text" id="formula" placeholder="수식을 입력하세요 (예: E=mc^2)" value="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}">
+    </div>
+    
+    <button onclick="generateImage()">그림 그리기</button>
+
+    <div id="result"></div>
+</div>
+
 <script>
-    // 본인의 API 키를 아래 따옴표 안에 넣으세요
-    const MY_API_KEY = "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"; 
+    // --- 본인의 API 키를 여기에 입력하세요 ---
+    const MY_API_KEY = "여기에_키를_넣으세요"; 
 
     async function generateImage() {
         const formula = document.getElementById('formula').value;
         const resultDiv = document.getElementById('result');
 
-        // 이제 키를 체크하는 로직 대신 변수를 사용합니다
-        if (!MY_API_KEY || MY_API_KEY === "YOUR_OPENAI_API_KEY_HERE") {
-            alert("코드 내부에 API 키를 올바르게 입력해주세요!");
+        if (!MY_API_KEY || MY_API_KEY === "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") {
+            alert("코드 내부에 API 키를 먼저 입력해주세요!");
             return;
         }
 
-        resultDiv.innerHTML = "<p class='loading'>학생이 연필로 쓰는 중... 잠시만 기다려주세요.</p>";
+        resultDiv.innerHTML = "<p class='loading'>연필로 슥슥 적는 중...</p>";
 
-        const prompt = `A realistic top-down photo of the mathematical equation '${formula}' handwritten in pencil on a piece of lined school notebook paper. Natural graphite texture, slightly irregular student handwriting, subtle smudges, soft natural lighting.`;
+        // 연필 느낌을 극대화하는 프롬프트
+        const prompt = `A ultra-realistic top-down close-up photo of the mathematical equation '${formula}' handwritten in graphite pencil on a piece of white lined notebook paper. Natural student handwriting, visible pencil texture, subtle lead smudges, soft side-lighting from a window. High resolution.`;
 
         try {
             const response = await fetch('https://api.openai.com/v1/images/generations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${MY_API_KEY}` // 내장된 키 사용
+                    'Authorization': `Bearer ${MY_API_KEY}`
                 },
                 body: JSON.stringify({
                     model: "dall-e-3",
@@ -35,12 +115,13 @@
             if (data.data && data.data[0].url) {
                 resultDiv.innerHTML = `<img src="${data.data[0].url}" alt="Handwritten Formula">`;
             } else {
-                console.error(data);
-                resultDiv.innerHTML = "<p>이미지 생성에 실패했습니다. API 키의 권한이나 잔액을 확인해주세요.</p>";
+                resultDiv.innerHTML = `<p style="color:red;">에러: ${data.error.message}</p>`;
             }
         } catch (error) {
-            console.error(error);
-            resultDiv.innerHTML = "<p>오류가 발생했습니다.</p>";
+            resultDiv.innerHTML = "<p style="color:red;">네트워크 오류가 발생했습니다.</p>";
         }
     }
 </script>
+
+</body>
+</html>
